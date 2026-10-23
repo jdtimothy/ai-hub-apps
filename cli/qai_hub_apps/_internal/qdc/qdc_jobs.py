@@ -179,7 +179,7 @@ def retry_qdc(
 
     Applied to QDC SDK calls that talk to the network and are idempotent: status
     polling (``get_job_status``), log retrieval/download (``get_job_log_files``,
-    ``download_job_log_files``), artifact upload (``upload_file``, whose only
+    ``download_job_log_files_v2``), artifact upload (``upload_file_v2``, whose only
     commit point is the final chunk and which returns the uuid of the successful
     attempt), and job submission (``submit_job``).
 
@@ -592,11 +592,10 @@ class QDCJobs:
         target_path
             Local path to save the downloaded file.
         """
-        # Safe to retry as-is: the SDK fetches the whole file into memory inside
-        # its own request, and only opens target_path (mode 'wb', single write)
-        # after a 200 response. A failed attempt never touches the file, and a
-        # later success truncates it -- so no partial/corrupt file can persist.
-        qdc_api.download_job_log_files(self.client, filename, target_path)
+        # Safe to retry as-is: the SDK fetches the presigned URL into memory and
+        # writes target_path in a single 'wb' write, so a later success
+        # truncates whatever an earlier attempt left behind.
+        qdc_api.download_job_log_files_v2(self.client, filename, target_path)
 
     @retry_qdc()
     def upload_file(self, file_path: str, artifact_type: ArtifactType) -> str:
@@ -614,11 +613,12 @@ class QDCJobs:
         artifact_id: str
             ID of the uploaded artifact.
         """
-        # The SDK uploads large bundles in chunks (start -> continue -> end); the
-        # artifact only commits at the final `end_upload`, and upload_file returns
-        # the uuid of the *successful* attempt -- so a retry after a mid-transfer
-        # drop at worst leaves an orphaned, unreferenced partial artifact server-
-        # side (a benign leak), never a duplicate job. We therefore still retry
-        # network errors here. The 403 actually observed in CI lands on the first
-        # call (post_artifacts_start_upload), before anything is committed.
-        return qdc_api.upload_file(self.client, file_path, artifact_type)
+        # The SDK uploads to presigned URLs (start -> PUT parts -> end); the
+        # artifact only commits at the final `end_upload_v2`, and upload_file_v2
+        # returns the uuid of the *successful* attempt -- so a retry after a
+        # mid-transfer drop at worst leaves an orphaned, unreferenced partial
+        # artifact server-side (a benign leak), never a duplicate job.
+        artifact_id = qdc_api.upload_file_v2(self.client, file_path, artifact_type)
+        if artifact_id is None:
+            raise RuntimeError(f"upload_file_v2 returned None for {file_path}")
+        return artifact_id

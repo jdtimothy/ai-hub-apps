@@ -663,14 +663,20 @@ def submit_app_bundle_to_qdc_device(
                         continue  # skip .mp4 and other non-text artifacts
 
                     base_name = os.path.basename(filename)
-                    zip_path = os.path.join(tmpdirname, f"{base_name}.zip")
+                    log_path = os.path.join(tmpdirname, base_name)
                     try:
-                        app_job.download_job_log_files(filename, zip_path)
-                        with zipfile.ZipFile(zip_path) as zf:
-                            contents = "\n".join(
-                                zf.read(name).decode("utf-8", errors="replace")
-                                for name in zf.namelist()
-                            )
+                        app_job.download_job_log_files(filename, log_path)
+                        if zipfile.is_zipfile(log_path):
+                            with zipfile.ZipFile(log_path) as zf:
+                                contents = "\n".join(
+                                    zf.read(name).decode("utf-8", errors="replace")
+                                    for name in zf.namelist()
+                                )
+                        else:
+                            with open(
+                                log_path, encoding="utf-8", errors="replace"
+                            ) as f:
+                                contents = f.read()
                         print(f"::group::QDC log: {base_name}")
                         print(contents)
                         print("::endgroup::")
