@@ -1,6 +1,53 @@
 schema_version: '1.2'
 min_cli_version: 0.30.1
 apps:
+- name: Image Colourization
+  id: colourization_ubuntu_py
+  status: published
+  headline: On-device image colourization with TFLite
+  description: A sample app for Ubuntu integrating an image-colourization model (DDColor) via TFLite Runtime. It uses GStreamer for input video and provides a minimal web interface to stream colourized frames suitable for embedded applications.
+  domain: Computer Vision
+  use_case: Image Editing
+  app_repo_url: https://github.com/qualcomm/ai-hub-apps/tree/main/apps/colourization_ubuntu_py
+  app_type: ubuntu
+  runtime:
+  - tflite
+  related_models:
+  - ddcolor
+  precisions:
+  - float
+  languages:
+  - Python
+  supported_devices:
+  - Arduino VENTUNO Q
+  - Dragonwing IQ-9075 EVK
+  model_file_paths:
+  - models/ddcolor.tflite
+- name: Depth Estimation
+  id: depth_estimation_ubuntu_py
+  status: published
+  headline: On-device monocular depth estimation with TFLite
+  description: A sample app for Ubuntu integrating monocular depth-estimation models (Depth-Anything, Depth-Anything-V2, Depth-Anything-V3, Midas) via TFLite Runtime. It uses GStreamer for input video and provides a minimal web interface to stream a depth heatmap suitable for embedded applications.
+  domain: Computer Vision
+  use_case: Depth Estimation
+  app_repo_url: https://github.com/qualcomm/ai-hub-apps/tree/main/apps/depth_estimation_ubuntu_py
+  app_type: ubuntu
+  runtime:
+  - tflite
+  related_models:
+  - depth_anything_v3
+  - depth_anything_v2
+  - depth_anything
+  - midas
+  precisions:
+  - float
+  languages:
+  - Python
+  supported_devices:
+  - Arduino VENTUNO Q
+  - Dragonwing IQ-9075 EVK
+  model_file_paths:
+  - models/depth_anything.tflite
 - name: EasyOCR Text Recognition
   id: easyocr_ubuntu_py
   status: published

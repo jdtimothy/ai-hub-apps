@@ -89,6 +89,8 @@ __NOTE: Some of these apps will run without NPU acceleration on non-Snapdragon®
 | [Semantic Segmentation](apps/semantic_segmentation_ubuntu_py) | Python | TensorFlow Lite | GStreamer |
 | [LiDAR Semantic Segmentation](apps/lidar_segmentation_ubuntu_py) | Python | TensorFlow Lite | |
 | [EasyOCR Text Recognition](apps/easyocr_ubuntu_py) | Python | TensorFlow Lite | GStreamer |
+| [Image Colourization](apps/colourization_ubuntu_py) | Python | TensorFlow Lite | GStreamer |
+| [Depth Estimation](apps/depth_estimation_ubuntu_py) | Python | TensorFlow Lite | GStreamer |
 <!-- /UBUNTU_APPS -->
 
 _\* Source available on GitHub; not included in the CLI release._
